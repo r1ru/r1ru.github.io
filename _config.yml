@@ -16,7 +16,7 @@ timezone: Asia/Tokyo
 
 title: r1ru # the main title
 
-tagline: low-level programming, program verification and CTF(pwn) # it will display as the subtitle
+tagline: # it will display as the subtitle
 
 description: >- # used by seo meta and the atom feed
 
