@@ -15,7 +15,7 @@ Hi, I'm Riru Oda, an undergraduate student in Japan majoring in Computer Science
 - Security Camp 2024 – Tutor
 - Security Camp 2025 Next – Student
 - Global Cybersecurity Camp 2025 Taiwan – Student 
-- [TsukuCTF 2025](https://ctftime.org/event/2769/) – Author of Pwn challenge  
+- [TsukuCTF 2025](https://ctftime.org/event/2769/) – Author of Pwn challenges
 
 ## Projects
 - [WasmOS](https://github.com/r1ru/WasmOS) – A microkernel that can run WebAssembly in kernel space, written in C.
