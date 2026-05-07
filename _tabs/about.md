@@ -5,7 +5,7 @@ order: 4
 ---
 
 ## About Me
-Hi, I'm Riru Oda, an undergraduate student in Japan majoring in Computer Science. I love low-level programming and binary exploitation. In my free time, I develop system software such as OS kernels and hypervisors, and enjoy playing CTF (pwn). In my research, I focus on bug finding using static analysis. I share my knowledge on my blog.
+Hi, I'm Riru Oda, a graduate student in Japan majoring in Computer Science. I love low-level programming and binary exploitation.
 
 ## Experiences
 - Security Camp 2022, 2023 – Student
