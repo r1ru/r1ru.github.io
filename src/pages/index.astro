@@ -1,0 +1,220 @@
+---
+import PostList from "@/components/blog/PostList.astro";
+import { getAllPosts, sortMDByDate } from "@/data/post";
+import PageLayout from "@/layouts/Base.astro";
+import { siteConfig } from "@/site-config";
+import { absoluteUrl, withBase } from "@/utils/path";
+import { Schema } from "astro-seo-schema";
+
+const allPosts = await getAllPosts();
+const allPostsByDate = sortMDByDate(allPosts);
+const TIMELINE_LIMIT = 5;
+const timelinePosts = allPostsByDate.slice(0, TIMELINE_LIMIT);
+const featuredPosts = allPostsByDate.filter((post) => post.data.featured);
+const archiveCount = allPosts.length;
+
+const profile = siteConfig.profile;
+const siteUrl = (path: string) => absoluteUrl(path, Astro.site);
+---
+
+<Schema
+	item={{
+		"@context": "https://schema.org",
+		"@type": "BreadcrumbList",
+		itemListElement: [
+			{
+				"@type": "ListItem",
+				position: 1,
+				name: "Home",
+				item: siteUrl("/"),
+			},
+			{
+				"@type": "ListItem",
+				position: 2,
+				name: "About",
+				item: siteUrl("/about"),
+			},
+			{
+				"@type": "ListItem",
+				position: 3,
+				name: "Posts",
+				item: siteUrl("/posts"),
+			},
+		],
+	}}
+/>
+
+<PageLayout meta={{ title: "Home", description: siteConfig.description }}>
+	<section class="hero">
+		<p>{siteConfig.description}</p>
+		<div class="socials">
+			{
+				profile?.github && (
+					<>
+						<a href={profile.github} rel="noreferrer" target="_blank">
+							GitHub
+						</a>
+						<span class="sep">·</span>
+					</>
+				)
+			}
+			{
+				profile?.linkedin && (
+					<>
+						<a href={profile.linkedin} rel="noreferrer" target="_blank">
+							LinkedIn
+						</a>
+						<span class="sep">·</span>
+					</>
+				)
+			}
+			{
+				profile?.email && (
+					<>
+						<a href={`mailto:${profile.email}`}>Email</a>
+						<span class="sep">·</span>
+					</>
+				)
+			}
+			<a href={withBase("/rss.xml")}>RSS</a>
+		</div>
+	</section>
+
+	{
+		featuredPosts.length > 0 && (
+			<section class="featured-posts" aria-labelledby="featured-label">
+				<div class="section-label" id="featured-label">
+					Featured
+				</div>
+				<div class="timeline">
+					<PostList posts={featuredPosts} headingLevel="h3" />
+				</div>
+			</section>
+		)
+	}
+
+	<section class="writing" aria-labelledby="posts-label">
+		<div class="section-label" id="posts-label">Posts</div>
+		<div class="timeline">
+			<PostList posts={timelinePosts} headingLevel="h3" />
+
+			<div class="archive-link" style={`--i: ${timelinePosts.length}`}>
+				<a data-astro-prefetch href={withBase("/posts/")}>View all {archiveCount} posts →</a>
+			</div>
+		</div>
+	</section>
+
+</PageLayout>
+
+<style>
+	/* ---------- Hero ---------- */
+	.hero {
+		margin-bottom: 76px;
+	}
+	.hero p {
+		font-size: 19.5px;
+		line-height: 1.65;
+		color: hsl(var(--theme-text));
+		margin: 0 0 22px;
+		max-width: 60ch;
+		text-wrap: pretty;
+		white-space: pre-line;
+	}
+	.socials {
+		font-family: var(--font-sans);
+		font-size: 13.5px;
+		color: hsl(var(--theme-text) / 0.72);
+		margin-top: 18px;
+	}
+	.socials a {
+		color: hsl(var(--theme-text-muted));
+		text-decoration: underline;
+		text-decoration-color: hsl(var(--theme-text) / 0.35);
+		text-decoration-thickness: 1px;
+		text-underline-offset: 3px;
+		transition:
+			color 0.2s ease,
+			text-decoration-color 0.2s ease;
+	}
+	.socials a:hover {
+		color: hsl(var(--theme-accent));
+		text-decoration-color: hsl(var(--theme-accent));
+	}
+	.socials .sep {
+		color: var(--faint);
+		margin: 0 9px;
+	}
+
+	/* ---------- Writing timeline ---------- */
+	.writing {
+		margin-bottom: 84px;
+	}
+
+	.featured-posts {
+		margin-bottom: 72px;
+	}
+
+	.archive-link {
+		grid-column: 2;
+		margin-top: 8px;
+		font-family: var(--font-sans);
+		font-size: 13.5px;
+		color: hsl(var(--theme-text) / 0.72);
+	}
+	.archive-link a {
+		display: inline-block;
+		padding: 6px 0;
+		color: hsl(var(--theme-text-muted));
+		text-decoration: underline;
+		text-decoration-color: hsl(var(--theme-text) / 0.35);
+		text-decoration-thickness: 1px;
+		text-underline-offset: 3px;
+		transition:
+			color 0.2s ease,
+			text-decoration-color 0.2s ease;
+	}
+	.archive-link a:hover {
+		color: hsl(var(--theme-accent));
+		text-decoration-color: hsl(var(--theme-accent));
+	}
+
+	.socials a:focus-visible,
+	.archive-link a:focus-visible {
+		outline: 2px solid hsl(var(--theme-accent));
+		outline-offset: 3px;
+		border-radius: 3px;
+	}
+
+	@media (max-width: 720px) {
+		.hero {
+			margin-bottom: 56px;
+		}
+		.hero p {
+			font-size: 18px;
+		}
+		.archive-link {
+			margin-top: 0;
+		}
+	}
+
+	@media (max-width: 420px) {
+		.hero {
+			margin-bottom: 48px;
+		}
+		.hero p {
+			font-size: 17px;
+		}
+		.socials {
+			font-size: 12.5px;
+		}
+		.socials .sep {
+			margin: 0 6px;
+		}
+		.writing {
+			margin-bottom: 64px;
+		}
+		.featured-posts {
+			margin-bottom: 56px;
+		}
+	}
+</style>

@@ -1,0 +1,94 @@
+---
+import {
+	getAllPosts,
+	getCategorySlug,
+	getUniqueCategoriesWithCount,
+	sortMDByDate,
+} from "@/data/post";
+import PageLayout from "@/layouts/Base.astro";
+import { withBase } from "@/utils/path";
+
+const posts = sortMDByDate(await getAllPosts());
+const categories = getUniqueCategoriesWithCount(posts);
+
+const meta = {
+	description: "Browse posts by category.",
+	title: "Categories",
+};
+---
+
+<PageLayout meta={meta}>
+	<section class="categories-index" aria-labelledby="categories-label">
+		<div class="section-label" id="categories-label">Categories · {categories.length}</div>
+		<ul class="category-run">
+			{
+				categories.map(([category, count]) => (
+					<li>
+						<a data-astro-prefetch href={withBase(`/categories/${getCategorySlug(category)}/`)}>
+							<span class="name">{category}</span>
+							<span class="count">{count}</span>
+						</a>
+					</li>
+				))
+			}
+		</ul>
+	</section>
+</PageLayout>
+
+<style>
+	.categories-index {
+		margin-bottom: 96px;
+	}
+
+	.category-run {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 12px 24px;
+		font-family: var(--font-mono);
+		max-width: 60ch;
+	}
+	.category-run a {
+		display: inline-flex;
+		align-items: baseline;
+		gap: 5px;
+		text-decoration: none;
+		color: hsl(var(--theme-text) / 0.78);
+		font-size: 14.5px;
+		letter-spacing: 0.01em;
+		transition: color 0.2s ease;
+	}
+	.category-run .name::before {
+		content: "/";
+		color: var(--faint);
+		transition: color 0.2s ease;
+	}
+	.category-run a:hover {
+		color: hsl(var(--theme-accent));
+	}
+	.category-run a:hover .name::before {
+		color: hsl(var(--theme-accent));
+	}
+	.category-run a:focus-visible {
+		outline: 2px solid hsl(var(--theme-accent));
+		outline-offset: 3px;
+		border-radius: 3px;
+	}
+	.category-run .count {
+		font-size: 11px;
+		color: hsl(var(--theme-text) / 0.4);
+		font-variant-numeric: tabular-nums;
+		font-feature-settings: "tnum";
+	}
+	.category-run a:hover .count {
+		color: hsl(var(--theme-accent) / 0.7);
+	}
+
+	@media (max-width: 420px) {
+		.categories-index {
+			margin-bottom: 64px;
+		}
+	}
+</style>

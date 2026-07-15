@@ -1,0 +1,98 @@
+---
+import {siteConfig} from "@/site-config";
+import type {SiteMeta} from "@/types";
+import {absoluteUrl, withBase} from "@/utils/path";
+import "../styles/global.css";
+// Preloaded body-font subset URL; everything else loads via @font-face.
+import newsreaderLatin from "@fontsource-variable/newsreader/files/newsreader-latin-wght-normal.woff2?url";
+
+type Props = SiteMeta;
+
+const {articleDate, description, ogImage, title} = Astro.props;
+
+const titleSeparator = "|";
+const siteTitle = `${title} ${titleSeparator} ${siteConfig.title}`;
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+const socialImageURL = ogImage ? absoluteUrl(ogImage, Astro.site) : undefined;
+
+const analytics = siteConfig.analytics;
+const gaId = analytics?.googleAnalyticsId;
+const goatcounter = analytics?.goatcounterUrl;
+---
+
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>{siteTitle}</title>
+
+<link href={canonicalURL} rel="canonical"/>
+
+<meta content={siteTitle} name="title"/>
+<meta content={description} name="description"/>
+<meta content={siteConfig.author} name="author"/>
+
+<link rel="preload" as="font" type="font/woff2" href={newsreaderLatin} crossorigin />
+
+{/* Default theme-color; ThemeProvider rewrites it to the active theme's bg. */}
+<meta content="#f6f1e6" name="theme-color"/>
+
+<meta content={articleDate ? "article" : "website"} property="og:type"/>
+<meta content={title} property="og:title"/>
+<meta content={description} property="og:description"/>
+<meta content={canonicalURL} property="og:url"/>
+<meta content={siteConfig.title} property="og:site_name"/>
+<meta content={siteConfig.ogLocale} property="og:locale"/>
+{
+    socialImageURL && (
+    <>
+        <meta content={socialImageURL} property="og:image"/>
+        <meta content="1200" property="og:image:width"/>
+        <meta content="630" property="og:image:height"/>
+    </>
+        )
+    }
+{
+    articleDate && (
+    <>
+        <meta content={siteConfig.author} property="article:author"/>
+        <meta content={articleDate} property="article:published_time"/>
+    </>
+        )
+    }
+
+<meta content={socialImageURL ? "summary_large_image" : "summary"} property="twitter:card"/>
+<meta content={canonicalURL} property="twitter:url"/>
+<meta content={title} property="twitter:title"/>
+<meta content={description} property="twitter:description"/>
+{socialImageURL && <meta content={socialImageURL} property="twitter:image"/>}
+
+<link href={withBase("/sitemap-index.xml")} rel="sitemap"/>
+
+<link href={withBase("/rss.xml")} rel="alternate" title={siteConfig.title} type="application/rss+xml"/>
+
+{
+    siteConfig.webmentions && (
+    <>
+        <link href={siteConfig.webmentions.link} rel="webmention"/>
+        {siteConfig.webmentions.pingback && (
+                <link href={siteConfig.webmentions.pingback} rel="pingback"/>
+        )}
+    </>
+        )
+    }
+
+<meta content={Astro.generator} name="generator"/>
+{gaId && (
+    <>
+        <script is:inline type="text/partytown" async src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}></script>
+        <script is:inline type="text/partytown" set:html={`
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', '${gaId}');
+`}></script>
+    </>
+)}
+{goatcounter && (
+    <script is:inline type="text/partytown" data-goatcounter={goatcounter}
+            async src="//gc.zgo.at/count.js"></script>
+)}
